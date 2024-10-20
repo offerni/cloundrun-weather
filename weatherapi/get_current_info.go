@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 )
 
@@ -35,7 +36,7 @@ func (c *Client) GetCurrentInfo(ctx context.Context, city string) (*GetCurrentIn
 	return &GetCurrentInfoResponse{
 		TempC: weatherInfo.Current.TempC,
 		TempF: weatherInfo.Current.TempF,
-		TempK: weatherInfo.Current.TempC + 273.15,
+		TempK: math.Round((weatherInfo.Current.TempC+273.15)*100) / 100,
 	}, nil
 }
 

@@ -24,10 +24,19 @@ func main() {
 
 		params := r.URL.Query()
 		cep := params.Get("cep")
+		if len(cep) != 8 {
+			http.Error(w, "Invalid CEP", http.StatusBadRequest)
+			return
+		}
 
 		address, err := viacep.GetAddress(ctx, cep)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if address == nil {
+			http.Error(w, "Address not found", http.StatusNotFound)
 			return
 		}
 

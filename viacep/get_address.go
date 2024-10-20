@@ -11,7 +11,7 @@ import (
 const baseUrl string = "https://viacep.com.br/ws/"
 const ServiceName string = "Via CEP"
 
-func GetAddress(ctx context.Context, cep string) (*address, error) {
+func GetAddress(ctx context.Context, cep string) (*GetAddressResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/%s/json", baseUrl, cep), nil)
 	if err != nil {
 		return nil, err
@@ -28,15 +28,19 @@ func GetAddress(ctx context.Context, cep string) (*address, error) {
 		return nil, err
 	}
 
-	var address address
+	var address GetAddressResponse
 	if err := json.Unmarshal(resBody, &address); err != nil {
 		return nil, err
+	}
+
+	if address.Cep == "" {
+		return nil, nil
 	}
 
 	return &address, nil
 }
 
-type address struct {
+type GetAddressResponse struct {
 	Cep         string `json:"cep"`
 	Logradouro  string `json:"logradouro"`
 	Complemento string `json:"complemento"`
