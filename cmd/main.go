@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,9 +13,16 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("GO_ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("Error loading .env file")
+		}
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+		log.Printf("PORT not set, defaulting to %s", port)
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -40,10 +46,14 @@ func main() {
 			return
 		}
 
-		aPIKey := os.Getenv("WEATHER_API_API_KEY")
+		apiKey := os.Getenv("WEATHER_API_API_KEY")
+		if apiKey == "" {
+			http.Error(w, "Weather API key not set", http.StatusInternalServerError)
+			return
+		}
 
 		client, err := weatherapi.NewAPIClient(weatherapi.NewAPIClientOpts{
-			APIKey: aPIKey,
+			APIKey: apiKey,
 		})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,6 +73,8 @@ func main() {
 		}
 	})
 
-	fmt.Println("Server running on port 8080")
-	http.ListenAndServe(":8080", nil)
+	log.Printf("Server running on port %s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }
