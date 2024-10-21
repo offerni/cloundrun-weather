@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-const baseUrl string = "https://api.weatherapi.com/v1/current.json"
+var baseUrl string = "https://api.weatherapi.com/v1/current.json"
 
 func (c *Client) GetCurrentInfo(ctx context.Context, city string) (*GetCurrentInfoResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s?key=%s&q=%s&aqi=no", baseUrl, c.APIKey, city), nil)

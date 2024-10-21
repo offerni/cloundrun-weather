@@ -8,7 +8,8 @@ import (
 	"net/http"
 )
 
-const baseUrl string = "https://viacep.com.br/ws/"
+var baseUrl string = "https://viacep.com.br/ws/"
+
 const ServiceName string = "Via CEP"
 
 func GetAddress(ctx context.Context, cep string) (*GetAddressResponse, error) {
